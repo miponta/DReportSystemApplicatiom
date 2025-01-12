@@ -123,32 +123,41 @@ public class EmployeeController {
     }
 
 
-    // 従業員更新処理
+ // 従業員更新処理
     @PostMapping(value = "/{code}/update")
-    public String update(@Validated Employee employee, BindingResult res, Model model) {
+    public String update(@PathVariable("code") String code, @Validated Employee employee, BindingResult res, Model model) {
+
+        // 名前が空白だった場合
+        if (employee.getName() == null || employee.getName().isEmpty()) {
+            model.addAttribute(
+                ErrorMessage.getErrorName(ErrorKinds.NAME_BLANK_ERROR),
+                ErrorMessage.getErrorValue(ErrorKinds.NAME_BLANK_ERROR)
+            );
+        }
 
         // 入力チェック
         if (res.hasErrors()) {
-            return "employees/update";
+            return edit(code, model);  // 更新エラーがあった場合、editメソッドに戻る
         }
 
-        // 論理削除を行った従業員番号を指定すると例外となるためtry~catchで対応
-        // (findByIdでは削除フラグがTRUEのデータが取得出来ないため)
+        // 更新処理を実行
         try {
-            ErrorKinds result = employeeService.save(employee);
+            ErrorKinds result = employeeService.update(employee);
 
             if (ErrorMessage.contains(result)) {
                 model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
-                return"employees/update";
+                return edit(code, model);  // 更新エラーがあった場合、editメソッドに戻る
             }
 
         } catch (DataIntegrityViolationException e) {
             model.addAttribute(ErrorMessage.getErrorName(ErrorKinds.DUPLICATE_EXCEPTION_ERROR),
                     ErrorMessage.getErrorValue(ErrorKinds.DUPLICATE_EXCEPTION_ERROR));
-            return "employees/update";
+            return edit(code, model);  // 例外処理時もeditメソッドに戻る
         }
 
-        return "redirect:/employees";
+        return "redirect:/employees";  // 更新後、一覧にリダイレクト
     }
+
+
 
 }

@@ -50,6 +50,32 @@ public class EmployeeService {
         return ErrorKinds.SUCCESS;
     }
 
+    // 従業員更新
+    @Transactional
+    public ErrorKinds update(Employee employee) {
+
+     // 名前チェック
+        if (employee.getName() == null || employee.getName().trim().isEmpty()) {
+            return ErrorKinds.BLANK_ERROR;
+        }
+
+     // パスワードチェック
+        ErrorKinds result = employeePasswordCheck(employee);
+        if (ErrorKinds.CHECK_OK != result) {
+            return result; // パスワードが無効またはエラーがあれば中断
+               }
+
+        // 現在の createdAt を保持し、更新しないようにする
+        Employee existingEmployee = findByCode(employee.getCode());
+        LocalDateTime now = LocalDateTime.now();
+        employee.setCreatedAt(existingEmployee.getCreatedAt());
+        employee.setUpdatedAt(now);
+
+     // データベースに保存
+        employeeRepository.save(employee);
+        return ErrorKinds.SUCCESS;
+    }
+
     // 従業員削除
     @Transactional
     public ErrorKinds delete(String code, UserDetail userDetail) {
@@ -83,10 +109,11 @@ public class EmployeeService {
     // 従業員パスワードチェック
     private ErrorKinds employeePasswordCheck(Employee employee) {
 
-        //パスワードが空白の場合はエラーをスキップ
+        //パスワードが空白の場合はエラーをスキップ（CHECK_OK を返す）
         if (employee.getPassword() == null || employee.getPassword().trim().isEmpty()) {
-            return null;
+            return ErrorKinds.CHECK_OK;
         }
+
 
         // 従業員パスワードの半角英数字チェック処理
         if (isHalfSizeCheckError(employee)) {
