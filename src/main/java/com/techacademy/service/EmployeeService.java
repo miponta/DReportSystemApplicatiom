@@ -50,6 +50,27 @@ public class EmployeeService {
         return ErrorKinds.SUCCESS;
     }
 
+    // 従業員更新
+    @Transactional
+    public ErrorKinds update(Employee employee) {
+
+     // パスワードチェック
+        ErrorKinds result = employeePasswordCheck(employee);
+        if (ErrorKinds.CHECK_OK != result) {
+            return result;
+        }
+
+        // 現在の createdAt を保持し、更新しないようにする
+        Employee existingEmployee = findByCode(employee.getCode());
+        LocalDateTime now = LocalDateTime.now();
+        employee.setCreatedAt(existingEmployee.getCreatedAt());
+        employee.setUpdatedAt(now);
+
+     // データベースに保存
+        employeeRepository.save(employee);
+        return ErrorKinds.SUCCESS;
+    }
+
     // 従業員削除
     @Transactional
     public ErrorKinds delete(String code, UserDetail userDetail) {
