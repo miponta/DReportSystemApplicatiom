@@ -54,11 +54,16 @@ public class EmployeeService {
     @Transactional
     public ErrorKinds update(Employee employee) {
 
+     // 名前チェック
+        if (employee.getName() == null || employee.getName().trim().isEmpty()) {
+            return ErrorKinds.BLANK_ERROR;
+        }
+
      // パスワードチェック
         ErrorKinds result = employeePasswordCheck(employee);
         if (ErrorKinds.CHECK_OK != result) {
-            return result;
-        }
+            return result; // パスワードが無効またはエラーがあれば中断
+               }
 
         // 現在の createdAt を保持し、更新しないようにする
         Employee existingEmployee = findByCode(employee.getCode());
@@ -104,10 +109,11 @@ public class EmployeeService {
     // 従業員パスワードチェック
     private ErrorKinds employeePasswordCheck(Employee employee) {
 
-        //パスワードが空白の場合はエラーをスキップ
+        //パスワードが空白の場合はエラーをスキップ（CHECK_OK を返す）
         if (employee.getPassword() == null || employee.getPassword().trim().isEmpty()) {
-            return null;
+            return ErrorKinds.CHECK_OK;
         }
+
 
         // 従業員パスワードの半角英数字チェック処理
         if (isHalfSizeCheckError(employee)) {

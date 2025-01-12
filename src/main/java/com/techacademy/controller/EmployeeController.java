@@ -127,6 +127,14 @@ public class EmployeeController {
     @PostMapping(value = "/{code}/update")
     public String update(@PathVariable("code") String code, @Validated Employee employee, BindingResult res, Model model) {
 
+        // 名前が空白だった場合
+        if (employee.getName() == null || employee.getName().isEmpty()) {
+            model.addAttribute(
+                ErrorMessage.getErrorName(ErrorKinds.NAME_BLANK_ERROR),
+                ErrorMessage.getErrorValue(ErrorKinds.NAME_BLANK_ERROR)
+            );
+        }
+
         // 入力チェック
         if (res.hasErrors()) {
             return edit(code, model);  // 更新エラーがあった場合、editメソッドに戻る
