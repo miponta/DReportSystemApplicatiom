@@ -13,6 +13,9 @@
             <div class="container-fluid p-0">
                 <h1 class="h3 mb-3">従業員 更新</h1>
             </div>
+            <div class="p-3 mb-2 bg-body-secondary text-black">
+            パスワードは変更する場合のみ入力してください
+            </div>
             <div class="col-12 col-xxl-6">
 
                 <div class="col-xl-12">
@@ -30,6 +33,7 @@
                                         <div class="col-md-7">
                                             <input class="form-control" type="text" th:field="*{name}" th:errorclass="err" id="name">
                                             <span th:if="${nameError != null}" th:text="${nameError}" class="text-danger"></span>
+                                            <span th:if="${nameLengthError != null}" th:text="${nameLengthError}" class="text-danger"></span>
                                         </div>
                                     </div>
                                     <div class="mb-3">

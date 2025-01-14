@@ -54,18 +54,23 @@ public class EmployeeService {
     @Transactional
     public ErrorKinds update(Employee employee) {
 
-     // 名前チェック
+    // 名前空白チェック
         if (employee.getName() == null || employee.getName().trim().isEmpty()) {
             return ErrorKinds.BLANK_ERROR;
         }
 
-     // パスワードチェック
+    //名前桁数チェック
+        if (employee.getName().length() > 20) {
+            return ErrorKinds.NAME_LENGTH_ERROR; // 桁数エラー
+        }
+
+    // パスワードチェック
         ErrorKinds result = employeePasswordCheck(employee);
         if (ErrorKinds.CHECK_OK != result) {
             return result; // パスワードが無効またはエラーがあれば中断
                }
 
-        // 現在の createdAt を保持し、更新しないようにする
+    // 現在の createdAt を保持し、更新しないようにする
         Employee existingEmployee = findByCode(employee.getCode());
         LocalDateTime now = LocalDateTime.now();
         employee.setCreatedAt(existingEmployee.getCreatedAt());

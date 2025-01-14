@@ -135,9 +135,17 @@ public class EmployeeController {
             );
         }
 
-        // 入力チェック
+     // 名前の桁数が20文字以上だった場合
+        if (employee.getName().length() > 20) {
+            model.addAttribute(
+                ErrorMessage.getErrorName(ErrorKinds.NAME_LENGTH_ERROR),
+                ErrorMessage.getErrorValue(ErrorKinds.NAME_LENGTH_ERROR)
+            );
+        }
+
+     // 入力チェック
         if (res.hasErrors()) {
-            return edit(code, model);  // 更新エラーがあった場合、editメソッドに戻る
+            return "employees/update";  // 更新エラーがあった場合、editメソッドに戻る
         }
 
         // 更新処理を実行
@@ -146,13 +154,13 @@ public class EmployeeController {
 
             if (ErrorMessage.contains(result)) {
                 model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
-                return edit(code, model);  // 更新エラーがあった場合、editメソッドに戻る
+                return "employees/update";  // 更新エラーがあった場合、editメソッドに戻る
             }
 
         } catch (DataIntegrityViolationException e) {
             model.addAttribute(ErrorMessage.getErrorName(ErrorKinds.DUPLICATE_EXCEPTION_ERROR),
                     ErrorMessage.getErrorValue(ErrorKinds.DUPLICATE_EXCEPTION_ERROR));
-            return edit(code, model);  // 例外処理時もeditメソッドに戻る
+            return "employees/update";  // 例外処理時もeditメソッドに戻る
         }
 
         return "redirect:/employees";  // 更新後、一覧にリダイレクト
